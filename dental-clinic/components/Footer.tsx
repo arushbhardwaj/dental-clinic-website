@@ -20,7 +20,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-2.5 mb-5">
+            <a href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2.5 mb-5">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
                 <span className="text-white text-lg">🦷</span>
               </div>
@@ -28,7 +28,7 @@ export default function Footer() {
                 <span className="font-display text-xl font-bold">SmileCare</span>
                 <span className="font-display text-xl font-light text-teal-400"> Dental</span>
               </div>
-            </div>
+            </a>
             <p className="text-white/50 text-sm leading-relaxed mb-5">
               Advanced dental care for confident smiles. Serving Bengaluru families since 2012.
             </p>
