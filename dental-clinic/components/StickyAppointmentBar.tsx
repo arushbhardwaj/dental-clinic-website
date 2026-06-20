@@ -8,14 +8,19 @@ export default function StickyAppointmentBar() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const hero = document.querySelector('section');
+    // Show the sticky bar once the hero section scrolls out of view.
+    const hero = document.getElementById('hero');
+    if (!hero) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => setVisible(!entry.isIntersecting),
       { threshold: 0 }
     );
-    if (hero) observer.observe(hero);
+
+    observer.observe(hero);
     return () => observer.disconnect();
   }, []);
+
 
   return (
     <AnimatePresence>

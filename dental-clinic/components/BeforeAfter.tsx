@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 import { beforeAfterCases } from '@/lib/data';
@@ -24,12 +24,27 @@ function BeforeAfterSlide({
     setSliderPos(Math.min(Math.max(pos, 5), 95));
   };
 
-  const handleMouseDown = () => { isDragging.current = true; };
-  const handleMouseUp = () => { isDragging.current = false; };
+  const handleMouseDown = () => {
+    isDragging.current = true;
+  };
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+  const handleMouseLeave = () => {
+    isDragging.current = false;
+  };
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging.current) handleMove(e.clientX);
   };
+
+  const handleTouchStart = () => {
+    isDragging.current = true;
+  };
+  const handleTouchEnd = () => {
+    isDragging.current = false;
+  };
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
     handleMove(e.touches[0].clientX);
   };
 
@@ -41,10 +56,13 @@ function BeforeAfterSlide({
       {/* Image comparison */}
       <div
         ref={containerRef}
-        className="relative aspect-[16/9] cursor-col-resize select-none overflow-hidden"
+        className="relative aspect-[16/9] cursor-col-resize select-none overflow-hidden touch-pan-x"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         onTouchMove={handleTouchMove}
       >
         {/* After image (full) */}
@@ -75,6 +93,7 @@ function BeforeAfterSlide({
         <div
           className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg cursor-col-resize"
           style={{ left: `${sliderPos}%` }}
+          aria-hidden="true"
         >
           <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center border-2 border-teal-400">
             <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,6 +136,15 @@ export default function BeforeAfter() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
   const [current, setCurrent] = useState(0);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setCurrent(emblaApi.selectedScrollSnap());
@@ -125,47 +153,77 @@ export default function BeforeAfter() {
   useEffect(() => {
     if (!emblaApi) return;
     emblaApi.on('select', onSelect);
+    return () => {
+      // emblaApi.off is not available in older versions; safe no-op for cleanup
+      try {
+        (emblaApi as any).off?.('select', onSelect);
+      } catch {
+        // ignore
+      }
+    };
   }, [emblaApi, onSelect]);
 
+  const slides = useMemo(() => beforeAfterCases, []);
+
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-slate-50">
+    <section className="py-24 sm:py-20 bg-gradient-to-b from-white to-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 sm:mb-12">
             <span className="text-teal-600 font-semibold text-sm tracking-widest uppercase">
               Real Results
             </span>
             <h2 className="mt-3 text-4xl md:text-5xl font-display font-bold text-navy">
               Before & After
             </h2>
-            <p className="mt-4 text-slate-500 text-lg max-w-2xl mx-auto">
-              See the life-changing smile transformations achieved by our expert team.
-              Drag the slider to compare.
+            <p className="mt-4 text-slate-500 text-base sm:text-lg max-w-2xl mx-auto">
+              See the life-changing smile transformations achieved by our expert team. Drag the slider to compare.
             </p>
           </div>
         </ScrollReveal>
 
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-6">
-            {beforeAfterCases.map((c, i) => (
-              <div key={i} className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)] min-w-0">
-                <BeforeAfterSlide caseData={c} index={i} />
-              </div>
+        {/* Mobile: stack vertically (1 column) */}
+        {isMobile ? (
+          <div className="flex flex-col gap-6">
+            {slides.map((c, i) => (
+              <BeforeAfterSlide key={i} caseData={c} index={i} />
             ))}
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Tablet/Desktop: Embla carousel */}
+            <div className="overflow-hidden w-full" ref={emblaRef}>
+              <div className="flex gap-6 touch-pan-x">
+                {slides.map((c, i) => (
+                  <div
+                    key={i}
+                    className="flex-[0_0_100%] sm:flex-[0_0_calc(50% - 12px)] lg:flex-[0_0_calc(33.333% - 16px)] min-w-0 w-full"
+                  >
+                    <BeforeAfterSlide caseData={c} index={i} />
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        {/* Dots */}
-        <div className="flex justify-center gap-2 mt-8">
-          {beforeAfterCases.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => emblaApi?.scrollTo(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${i === current ? 'w-8 bg-teal-500' : 'w-2 bg-slate-300'
-                }`}
-            />
-          ))}
-        </div>
+            {/* Dots */}
+            <div className="flex justify-center gap-2 mt-8 sm:mt-6">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => emblaApi?.scrollTo(i)}
+                  disabled={!emblaApi}
+                  className="min-w-[8px] h-2 rounded-full transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                  aria-label={`Go to slide ${i + 1}`}
+                >
+                  <span
+                    className={`block h-2 rounded-full transition-all duration-300 ${i === current ? 'w-8 bg-teal-500' : 'w-2 bg-slate-300'
+                      }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
