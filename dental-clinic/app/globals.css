@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0B1C3F;
+  --color-navy-800: #142952;
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-200: #99f6e4;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+
+  --animate-ping: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  ::selection {
+    background-color: #ccfbf1;
+    color: #0B1C3F;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f8fafc;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0d9488;
+    border-radius: 9999px;
+  }
+
+  /* Dark mode */
+  .dark body {
+    background-color: #0B1C3F;
+    color: #F8FAFC;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: #142952;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #2dd4bf;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
