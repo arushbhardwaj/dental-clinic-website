@@ -1,10 +1,12 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: 'export',
   images: {
     // Next 16 requires formats to be only avif/webp (jpeg/png are migrated)
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [],
+    unoptimized: true,
   },
   compress: true,
 
