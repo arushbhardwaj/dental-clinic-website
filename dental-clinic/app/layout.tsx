@@ -15,9 +15,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'SmileCare Dental | Advanced Dental Care in Bengaluru',
-  description:
-    'Expert dental care in Bengaluru. Dental implants, teeth whitening, root canal, Invisalign, smile makeover & more. Book your appointment today with Dr. Arjun Sharma.',
+  title: 'Dental Clinic',
+  description: 'Professional dental care website',
   keywords: [
     'dental clinic Bengaluru',
     'dentist Koramangala',

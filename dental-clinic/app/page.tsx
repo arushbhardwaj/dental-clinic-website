@@ -15,23 +15,21 @@ import LoadingScreen from '@/components/LoadingScreen';
 
 export default function Home() {
   return (
-    <>
-      <LoadingScreen />
+    <main>
       <Navbar />
-      <main>
-        <HeroSection />
-        <AboutDoctor />
-        <Treatments />
-        <WhyChooseUs />
-        <Testimonials />
-        <ClinicGallery />
-        <AppointmentBooking />
-        <FAQ />
-        <ContactSection />
-      </main>
+      <HeroSection />
+      <AboutDoctor />
+      <Treatments />
+      <WhyChooseUs />
+      <Testimonials />
+      <ClinicGallery />
+      <AppointmentBooking />
+      <FAQ />
+      <ContactSection />
       <Footer />
       <FloatingWhatsApp />
       <StickyAppointmentBar />
-    </>
+      <LoadingScreen />
+    </main>
   );
 }
