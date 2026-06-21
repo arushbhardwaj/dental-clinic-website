@@ -1,7 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "next build",
+  "framework": null,
   "outputDirectory": "out",
-  "installCommand": "npm install",
-  "framework": null
+  "buildCommand": "next build"
 }
